@@ -412,6 +412,46 @@
       line-height: 1.5;
     }
 
+    /* Badge automático */
+    .auto-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--blue-light);
+      border: 1px solid var(--border-hi);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+    /* Campo auto — solo lectura visual */
+    .field-auto input[type="text"],
+    .field-auto select[disabled] {
+      background: var(--surface-3);
+      border-color: var(--border);
+      color: var(--blue);
+      font-weight: 600;
+      cursor: default;
+    }
+    /* Nota informativa ámbar */
+    .info-note {
+      display: flex;
+      gap: 8px;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 11.5px;
+      color: var(--amber);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .info-note .ni { flex-shrink: 0; }
+
     /* Footer */
     .footer {
       max-width: 1020px;
@@ -512,41 +552,35 @@
         <div class="g3">
           <div class="field">
             <label>Edad (años)</label>
-            <input type="number" name="edad" min="0" max="120" placeholder="55" required />
+            <input type="number" name="edad" id="inp_edad" min="0" max="120" placeholder="55" required />
           </div>
           <div class="field">
             <label>PA Sistólica (mmHg)</label>
-            <input type="number" name="pas" min="60" max="300" placeholder="160" required />
+            <input type="number" name="pas" id="inp_pas" min="60" max="300" placeholder="160" required />
           </div>
           <div class="field">
             <label>PA Diastólica (mmHg)</label>
-            <input type="number" name="pad" min="30" max="200" placeholder="95" required />
+            <input type="number" name="pad" id="inp_pad" min="30" max="200" placeholder="95" required />
           </div>
         </div>
 
-        <div class="g2" style="margin-top:14px">
-          <div class="field">
-            <label>Estadio HTA</label>
-            <select name="estadio_hta">
-              <option value="Normal">🟢 Normal</option>
-              <option value="Elevada">🟡 Elevada</option>
-              <option value="HTA_1" selected>🟠 HTA Estadio 1</option>
-              <option value="HTA_2">🔴 HTA Estadio 2</option>
-              <option value="Crisis_HTA">🚨 Crisis Hipertensiva</option>
+        <!-- Estadio HTA: calculado automáticamente -->
+        <div style="margin-top:14px">
+          <div class="field field-auto">
+            <label>
+              Estadio HTA
+              <span class="auto-badge">⚡ Automático</span>
+            </label>
+            <select name="estadio_hta" id="estadio_display" disabled>
+              <option value="Normal">🟢 Normal (&lt;120/80)</option>
+              <option value="Elevada">🟡 Elevada (120–129/&lt;80)</option>
+              <option value="HTA_1">🟠 HTA Estadio 1 (130–139/80–89)</option>
+              <option value="HTA_2">🔴 HTA Estadio 2 (140–179/90–119)</option>
+              <option value="Crisis_HTA">🚨 Crisis Hipertensiva (≥180/≥120)</option>
               <option value="Desconocido">❓ Desconocido</option>
             </select>
-          </div>
-          <div class="field">
-            <label>N° diagnósticos totales</label>
-            <input type="number" name="n_diagnosticos" min="0" placeholder="3" required />
-          </div>
-          <div class="field">
-            <label>Diagnósticos definitivos</label>
-            <input type="number" name="n_diag_definitivos" min="0" placeholder="2" value="0" />
-          </div>
-          <div class="field">
-            <label>N° comorbilidades</label>
-            <input type="number" name="n_comorbilidades" min="0" placeholder="1" value="0" />
+            <!-- campo oculto que sí se envía -->
+            <input type="hidden" name="estadio_hta" id="estadio_hta_val" value="Desconocido" />
           </div>
         </div>
 
@@ -571,21 +605,48 @@
     <div class="card">
       <div class="card-head">
         <span class="step">3</span>
-        <h2>💊 Comorbilidades</h2>
+        <h2>💊 Comorbilidades y historial</h2>
       </div>
       <div class="card-body">
+
+        <div class="info-note">
+          <span class="ni">💡</span>
+          <span>En un sistema integrado con HIS, los campos de historial se completarían automáticamente desde el expediente del paciente. Para esta demo se ingresan manualmente.</span>
+        </div>
+
         <div class="flags">
-          <label class="flag"><input type="checkbox" name="flag_dm2" value="1"><span class="flag-check"></span><span class="flag-text">🩸 DM2</span></label>
-          <label class="flag"><input type="checkbox" name="flag_icc" value="1"><span class="flag-check"></span><span class="flag-text">❤️‍🩹 Insuf. Cardíaca</span></label>
-          <label class="flag"><input type="checkbox" name="flag_erc" value="1"><span class="flag-check"></span><span class="flag-text">🫘 Enf. Renal Crónica</span></label>
-          <label class="flag"><input type="checkbox" name="flag_epoc" value="1"><span class="flag-check"></span><span class="flag-text">🫁 EPOC</span></label>
-          <label class="flag"><input type="checkbox" name="flag_obesidad" value="1"><span class="flag-check"></span><span class="flag-text">⚖️ Obesidad</span></label>
-          <label class="flag"><input type="checkbox" name="flag_acv" value="1"><span class="flag-check"></span><span class="flag-text">🧠 ACV previo</span></label>
-          <label class="flag"><input type="checkbox" name="flag_infarto" value="1"><span class="flag-check"></span><span class="flag-text">💔 Infarto previo</span></label>
+          <label class="flag"><input type="checkbox" name="flag_dm2"       value="1"><span class="flag-check"></span><span class="flag-text">🩸 DM2</span></label>
+          <label class="flag"><input type="checkbox" name="flag_icc"       value="1"><span class="flag-check"></span><span class="flag-text">❤️‍🩹 Insuf. Cardíaca</span></label>
+          <label class="flag"><input type="checkbox" name="flag_erc"       value="1"><span class="flag-check"></span><span class="flag-text">🫘 Enf. Renal Crónica</span></label>
+          <label class="flag"><input type="checkbox" name="flag_epoc"      value="1"><span class="flag-check"></span><span class="flag-text">🫁 EPOC</span></label>
+          <label class="flag"><input type="checkbox" name="flag_obesidad"  value="1"><span class="flag-check"></span><span class="flag-text">⚖️ Obesidad</span></label>
+          <label class="flag"><input type="checkbox" name="flag_acv"       value="1"><span class="flag-check"></span><span class="flag-text">🧠 ACV previo</span></label>
+          <label class="flag"><input type="checkbox" name="flag_infarto"   value="1"><span class="flag-check"></span><span class="flag-text">💔 Infarto previo</span></label>
           <label class="flag"><input type="checkbox" name="flag_dislipemia" value="1"><span class="flag-check"></span><span class="flag-text">🧪 Dislipemia</span></label>
-          <label class="flag"><input type="checkbox" name="flag_ansiedad" value="1"><span class="flag-check"></span><span class="flag-text">😟 Ansiedad</span></label>
+          <label class="flag"><input type="checkbox" name="flag_ansiedad"  value="1"><span class="flag-check"></span><span class="flag-text">😟 Ansiedad</span></label>
           <label class="flag"><input type="checkbox" name="flag_depresion" value="1"><span class="flag-check"></span><span class="flag-text">😔 Depresión</span></label>
         </div>
+
+        <div class="subsection" style="margin-top:18px">📁 Historial de diagnósticos</div>
+        <div class="g3">
+          <div class="field">
+            <label>N° diagnósticos totales</label>
+            <input type="number" name="n_diagnosticos" min="0" placeholder="3" value="1" required />
+          </div>
+          <div class="field">
+            <label>Diagnósticos definitivos</label>
+            <input type="number" name="n_diag_definitivos" min="0" placeholder="2" value="1" />
+          </div>
+          <div class="field field-auto">
+            <label>
+              N° comorbilidades
+              <span class="auto-badge">⚡ Automático</span>
+            </label>
+            <input type="text" id="n_comorbilidades_display" value="0" readonly />
+            <input type="hidden" name="n_comorbilidades" id="n_comorbilidades_val" value="0" />
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -637,6 +698,52 @@ function meta(c) { return CLASE_META[c] || { emoji: '•', label: c, color: 'gre
 // ════ Fecha por defecto ════
 document.getElementById('fecha_atencion').value = new Date().toISOString().split('T')[0];
 
+// ════════════════════════════════════════════════
+// ESTADIO HTA AUTOMÁTICO (lógica JNC8 / ESC-ESH)
+// Replica exacta del código Polars del notebook
+// ════════════════════════════════════════════════
+function calcularEstadio(pas, pad) {
+  if (isNaN(pas) || isNaN(pad) || pas === '' || pad === '') return 'Desconocido';
+  if (pas < 120 && pad < 80)   return 'Normal';
+  if (pas < 130 && pad < 80)   return 'Elevada';
+  if (pas < 140 || pad < 90)   return 'HTA_1';
+  if (pas < 180 || pad < 120)  return 'HTA_2';
+  return 'Crisis_HTA';
+}
+
+function actualizarEstadio() {
+  const pas = parseFloat(document.getElementById('inp_pas').value);
+  const pad = parseFloat(document.getElementById('inp_pad').value);
+  const estadio = calcularEstadio(pas, pad);
+
+  document.getElementById('estadio_display').value   = estadio;
+  document.getElementById('estadio_hta_val').value   = estadio;
+}
+
+document.getElementById('inp_pas').addEventListener('input', actualizarEstadio);
+document.getElementById('inp_pad').addEventListener('input', actualizarEstadio);
+
+// ════════════════════════════════════════════════
+// N° COMORBILIDADES AUTOMÁTICO
+// Suma los checkboxes marcados
+// ════════════════════════════════════════════════
+const FLAG_NAMES = ['flag_dm2','flag_icc','flag_erc','flag_epoc','flag_obesidad',
+                    'flag_acv','flag_infarto','flag_dislipemia','flag_ansiedad','flag_depresion'];
+
+function actualizarComorbilidades() {
+  const total = FLAG_NAMES.reduce((acc, name) => {
+    const cb = document.querySelector(`input[name="${name}"]`);
+    return acc + (cb && cb.checked ? 1 : 0);
+  }, 0);
+  document.getElementById('n_comorbilidades_display').value = total;
+  document.getElementById('n_comorbilidades_val').value     = total;
+}
+
+FLAG_NAMES.forEach(name => {
+  const cb = document.querySelector(`input[name="${name}"]`);
+  if (cb) cb.addEventListener('change', actualizarComorbilidades);
+});
+
 // ════ Render resultado ════
 function renderResult(d) {
   const m  = meta(d.destino_predicho);
@@ -662,37 +769,42 @@ function renderResult(d) {
     <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">📊 Distribución de probabilidad</p>
     <div class="prob-list">${bars}</div>
 
-    <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">🧮 Features derivadas</p>
+    <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">🧮 Features derivadas automáticamente</p>
     <div class="kv">
+      <div class="kv-box"><div class="kv-key">Estadio HTA</div><div class="kv-val" style="font-size:12px">${fc.ESTADIO_HTA || d.estadio_hta || '—'}</div></div>
       <div class="kv-box"><div class="kv-key">Presión de pulso</div><div class="kv-val">${fc.PP} mmHg</div></div>
       <div class="kv-box"><div class="kv-key">PAM</div><div class="kv-val">${fc.PAM} mmHg</div></div>
       <div class="kv-box"><div class="kv-key">PA Controlada</div><div class="kv-val">${fc.PA_controlada ? '✅ Sí' : '❌ No'}</div></div>
-      <div class="kv-box"><div class="kv-key">Grupo etario</div><div class="kv-val" style="font-size:12px">${fc.GRUPO_EDAD.replace(/_/g,' ')}</div></div>
-      <div class="kv-box" style="grid-column:span 2"><div class="kv-key">Índice de complejidad</div><div class="kv-val">${fc.IDX_complejidad}</div></div>
+      <div class="kv-box"><div class="kv-key">Grupo etario</div><div class="kv-val" style="font-size:12px">${fc.GRUPO_EDAD}</div></div>
+      <div class="kv-box"><div class="kv-key">Índice complejidad</div><div class="kv-val">${fc.IDX_complejidad}</div></div>
     </div>`;
 }
 
 // ════ Recopilar form ════
 function getPayload() {
-  const flags = ['flag_dm2','flag_icc','flag_erc','flag_epoc','flag_obesidad',
-                 'flag_acv','flag_infarto','flag_dislipemia','flag_ansiedad','flag_depresion'];
-  const numFields = ['edad','pas','pad','nivel_eess','flag_hospitalizado','dias_hosp',
-                     'n_diagnosticos','n_diag_definitivos','n_comorbilidades','fecate_post_fecfed',
-                     ...flags];
-
   const payload = { fecate_post_fecfed: 1 };
-  flags.forEach(f => payload[f] = 0);
 
-  // Campos de texto/select/date
-  ['fecha_atencion','tipo_personal_salud','sexo','estadio_hta'].forEach(n => {
+  // Flags default 0
+  FLAG_NAMES.forEach(f => payload[f] = 0);
+
+  // Campos texto/select/date
+  ['fecha_atencion','tipo_personal_salud','sexo'].forEach(n => {
     const el = document.querySelector(`[name="${n}"]`);
     if (el) payload[n] = el.value;
   });
 
-  numFields.forEach(n => {
+  // Estadio desde campo oculto (calculado automáticamente)
+  payload.estadio_hta = document.getElementById('estadio_hta_val').value || 'Desconocido';
+
+  // Campos numéricos manuales
+  ['edad','pas','pad','nivel_eess','flag_hospitalizado','dias_hosp',
+   'n_diagnosticos','n_diag_definitivos'].forEach(n => {
     const el = document.querySelector(`[name="${n}"]`);
     if (el) payload[n] = parseFloat(el.value) || 0;
   });
+
+  // Comorbilidades desde campo oculto (calculado automáticamente)
+  payload.n_comorbilidades = parseInt(document.getElementById('n_comorbilidades_val').value) || 0;
 
   // Checkboxes marcados
   document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
@@ -712,10 +824,12 @@ document.getElementById('btnPredict').addEventListener('click', async () => {
   resultBody.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><div class="spin-label">Procesando datos clínicos…</div></div>`;
 
   try {
+    const payload = getPayload();
+
     const res = await fetch(`${API_URL}/predecir`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(getPayload()),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
@@ -723,7 +837,9 @@ document.getElementById('btnPredict').addEventListener('click', async () => {
       throw new Error(err.detail || `Error ${res.status}`);
     }
 
-    renderResult(await res.json());
+    const data = await res.json();
+    data.estadio_hta = payload.estadio_hta; // pasar para mostrarlo en KV
+    renderResult(data);
 
   } catch (err) {
     resultBody.innerHTML = `<div class="err-box">⚠️ <strong>Error al conectar con el servidor</strong><br><br>${err.message}<br><br>Verifica que el backend esté activo en Render.</div>`;
