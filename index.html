@@ -4,27 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HTA Predictor — Destino Clínico</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ── Tokens ──────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════
+       TOKENS — Paleta clínica azul-blanca
+       Inspirada en pantallas hospitalarias modernas:
+       fondo blanco hueso, azul marino institucional,
+       verde quirúrgico para OK, rojo de alerta suave
+    ════════════════════════════════════════════════ */
     :root {
-      --bg:          #0a0f1a;
-      --surface:     #111827;
-      --surface-2:   #1a2235;
-      --border:      #1e3050;
-      --border-hi:   #2d4a7a;
-      --text:        #e2e8f0;
-      --text-muted:  #64748b;
-      --text-dim:    #94a3b8;
-      --accent:      #38bdf8;
-      --accent-glow: rgba(56,189,248,.15);
-      --green:       #22c55e;
-      --orange:      #f59e0b;
-      --red:         #ef4444;
-      --red-glow:    rgba(239,68,68,.15);
-      --mono:        'IBM Plex Mono', monospace;
-      --sans:        'IBM Plex Sans', sans-serif;
-      --radius:      6px;
+      /* Superficies */
+      --bg:          #EFF3F8;
+      --surface:     #FFFFFF;
+      --surface-2:   #F5F8FC;
+      --surface-3:   #EBF2FA;
+
+      /* Bordes */
+      --border:      #D6E4F0;
+      --border-hi:   #B3CDE8;
+
+      /* Texto */
+      --text:        #0F2A47;
+      --text-dim:    #3D6080;
+      --text-muted:  #7A9AB8;
+
+      /* Acento principal — azul EsSalud */
+      --blue:        #0055A5;
+      --blue-mid:    #1A73C8;
+      --blue-light:  #E8F1FB;
+      --blue-glow:   rgba(0,85,165,.12);
+
+      /* Semáforo clínico */
+      --red:         #C0392B;
+      --red-bg:      #FDF0EE;
+      --red-border:  #E8A49B;
+
+      --amber:       #B95C00;
+      --amber-bg:    #FEF5E7;
+      --amber-border:#F0C080;
+
+      --green:       #1A7A40;
+      --green-bg:    #EEF8F2;
+      --green-border:#82C9A0;
+
+      /* Tipografía */
+      --sans:        'Inter', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', monospace;
+
+      --radius-sm:   6px;
+      --radius:      10px;
+      --radius-lg:   14px;
+
+      --shadow-sm:   0 1px 3px rgba(0,40,90,.06);
+      --shadow:      0 2px 8px rgba(0,40,90,.08);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,661 +66,656 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 0 0 80px;
+      padding-bottom: 64px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Header ─────────────────────────────────────────────── */
+    /* ════ HEADER ════ */
     header {
-      border-bottom: 1px solid var(--border);
-      padding: 20px 32px;
+      background: var(--blue);
+      padding: 0 24px;
       display: flex;
       align-items: center;
       gap: 16px;
-      background: var(--surface);
+      height: 64px;
+      box-shadow: 0 2px 8px rgba(0,40,90,.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .12em;
-      color: var(--accent);
-      background: var(--accent-glow);
-      border: 1px solid var(--accent);
-      border-radius: 3px;
-      padding: 3px 8px;
-      text-transform: uppercase;
+
+    .header-cross {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.15);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
     }
-    header h1 {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text);
+
+    .header-text { flex: 1; }
+    .header-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
       letter-spacing: .01em;
     }
-    header p {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
+    .header-text p {
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+      margin-top: 1px;
     }
 
-    /* ── Layout ─────────────────────────────────────────────── */
-    .container {
-      max-width: 960px;
+    .header-pill {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,.9);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ════ LAYOUT ════ */
+    .page {
+      max-width: 1020px;
       margin: 0 auto;
-      padding: 32px 24px 0;
+      padding: 28px 16px 0;
       display: grid;
       grid-template-columns: 1fr 340px;
-      gap: 24px;
+      gap: 20px;
       align-items: start;
     }
-    @media (max-width: 720px) {
-      .container { grid-template-columns: 1fr; }
-    }
 
-    /* ── Cards ──────────────────────────────────────────────── */
+    /* ════ CARDS ════ */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
     }
-    .card-header {
-      padding: 14px 20px;
+
+    .card-head {
+      padding: 13px 18px;
       border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .card-header .eyebrow {
-      font-family: var(--mono);
+    .card-head .step {
+      width: 22px; height: 22px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
       font-size: 10px;
-      color: var(--text-muted);
-      letter-spacing: .1em;
-      text-transform: uppercase;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-    .card-header h2 {
+    .card-head h2 {
       font-size: 13px;
-      font-weight: 500;
-      color: var(--text-dim);
+      font-weight: 600;
+      color: var(--text);
     }
-    .card-body { padding: 20px; }
+    .card-body { padding: 18px; }
 
-    /* ── Form ───────────────────────────────────────────────── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-    .span-2 { grid-column: span 2; }
+    /* ════ GRIDS DE FORMULARIO ════ */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
+    /* ════ CAMPOS ════ */
     .field { display: flex; flex-direction: column; gap: 5px; }
-    label {
+
+    .field label {
       font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: .04em;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: .05em;
       text-transform: uppercase;
     }
 
     input[type="number"],
     input[type="date"],
     select {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1.5px solid var(--border-hi);
+      border-radius: var(--radius-sm);
       color: var(--text);
       font-family: var(--mono);
       font-size: 13px;
       padding: 9px 12px;
       width: 100%;
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
       appearance: none;
     }
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px var(--blue-glow);
     }
-    select option { background: #111827; }
+    input::placeholder { color: var(--text-muted); }
 
-    /* Checkboxes grid */
-    .flags-grid {
+    /* ════ SEPARADOR DE SECCIÓN ════ */
+    .subsection {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 18px 0 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .subsection::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ════ CHECKBOXES COMORBILIDADES ════ */
+    .flags {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
       gap: 8px;
     }
-    .flag-item {
+
+    .flag {
       display: flex;
       align-items: center;
       gap: 8px;
       background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
       cursor: pointer;
       transition: border-color .15s, background .15s;
       user-select: none;
     }
-    .flag-item:has(input:checked) {
-      background: rgba(56,189,248,.08);
-      border-color: var(--accent);
+    .flag:has(input:checked) {
+      background: var(--blue-light);
+      border-color: var(--blue-mid);
     }
-    .flag-item input { display: none; }
-    .flag-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      border: 1px solid var(--text-muted);
+    .flag input { display: none; }
+
+    .flag-check {
+      width: 16px; height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border-hi);
       flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
       transition: background .15s, border-color .15s;
-    }
-    .flag-item:has(input:checked) .flag-dot {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-    .flag-label { font-size: 12px; color: var(--text-dim); }
-
-    /* Divider */
-    .section-divider {
-      font-family: var(--mono);
       font-size: 10px;
-      color: var(--text-muted);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: 16px 0 8px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 14px;
+      color: transparent;
     }
+    .flag:has(input:checked) .flag-check {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+    .flag-check::after { content: '✓'; }
 
-    /* Submit */
-    .btn-submit {
+    .flag-text { font-size: 12px; color: var(--text-dim); font-weight: 500; }
+    .flag:has(input:checked) .flag-text { color: var(--blue); }
+
+    /* ════ BOTÓN SUBMIT ════ */
+    .btn-predict {
       width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: #0a0f1a;
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: .06em;
+      padding: 14px 20px;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
       border: none;
       border-radius: var(--radius);
       cursor: pointer;
-      transition: opacity .15s, transform .1s;
-      margin-top: 20px;
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .15s, transform .1s;
+      box-shadow: 0 3px 10px rgba(0,85,165,.3);
+      margin-top: 4px;
     }
-    .btn-submit:hover { opacity: .88; }
-    .btn-submit:active { transform: scale(.99); }
-    .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-predict:hover:not(:disabled) { background: var(--blue-mid); }
+    .btn-predict:active:not(:disabled) { transform: scale(.99); }
+    .btn-predict:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* ── Resultado panel ────────────────────────────────────── */
-    .result-panel { position: sticky; top: 24px; }
+    /* ════ PANEL RESULTADO ════ */
+    .result-sticky { position: sticky; top: 80px; }
 
     .result-empty {
+      padding: 48px 20px;
       text-align: center;
-      padding: 48px 24px;
       color: var(--text-muted);
-      font-size: 13px;
     }
-    .result-empty .icon { font-size: 32px; margin-bottom: 10px; opacity: .4; }
+    .result-empty .big { font-size: 40px; margin-bottom: 10px; }
+    .result-empty p { font-size: 13px; line-height: 1.5; }
+    .result-empty strong { color: var(--text-dim); }
 
-    /* Destino badge */
-    .destino-badge {
-      border-radius: 4px;
+    /* Badge de destino */
+    .destino-card {
+      border-radius: var(--radius);
       padding: 20px;
       text-align: center;
       margin-bottom: 16px;
+      border: 1.5px solid;
     }
-    .destino-badge.red    { background: var(--red-glow);    border: 1px solid var(--red); }
-    .destino-badge.orange { background: rgba(245,158,11,.1); border: 1px solid var(--orange); }
-    .destino-badge.green  { background: rgba(34,197,94,.1);  border: 1px solid var(--green); }
+    .destino-card.red    { background: var(--red-bg);   border-color: var(--red-border); }
+    .destino-card.amber  { background: var(--amber-bg); border-color: var(--amber-border); }
+    .destino-card.green  { background: var(--green-bg); border-color: var(--green-border); }
 
-    .destino-label {
-      font-family: var(--mono);
+    .destino-emoji { font-size: 34px; margin-bottom: 6px; }
+    .destino-eyebrow {
       font-size: 10px;
-      letter-spacing: .12em;
+      font-weight: 700;
+      letter-spacing: .1em;
       text-transform: uppercase;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
-    .destino-valor {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: .02em;
+    .destino-label {
+      font-size: 22px;
+      font-weight: 700;
     }
-    .destino-badge.red    .destino-valor { color: var(--red); }
-    .destino-badge.orange .destino-valor { color: var(--orange); }
-    .destino-badge.green  .destino-valor { color: var(--green); }
+    .destino-card.red   .destino-label { color: var(--red); }
+    .destino-card.amber .destino-label { color: var(--amber); }
+    .destino-card.green .destino-label { color: var(--green); }
 
-    .confianza {
+    .destino-conf {
       font-family: var(--mono);
       font-size: 12px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     /* Barras de probabilidad */
-    .prob-list { display: flex; flex-direction: column; gap: 10px; }
-    .prob-item label {
+    .prob-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+    .prob-row { display: flex; flex-direction: column; gap: 4px; }
+    .prob-label {
       display: flex;
       justify-content: space-between;
-      text-transform: none;
-      letter-spacing: 0;
-      margin-bottom: 4px;
       font-size: 12px;
+      font-weight: 500;
       color: var(--text-dim);
     }
-    .prob-item label span {
+    .prob-label span {
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text-muted);
     }
-    .prob-bar-bg {
-      height: 5px;
-      background: var(--border);
-      border-radius: 3px;
+    .prob-track {
+      height: 7px;
+      background: var(--surface-3);
+      border-radius: 4px;
       overflow: hidden;
     }
-    .prob-bar-fill {
+    .prob-fill {
       height: 100%;
-      border-radius: 3px;
-      transition: width .5s ease;
+      border-radius: 4px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
     }
 
-    /* Features calculadas */
-    .kv-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .kv-item {
+    /* KV features */
+    .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kv-box {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
     }
     .kv-key {
-      font-family: var(--mono);
       font-size: 9px;
+      font-weight: 700;
       color: var(--text-muted);
-      letter-spacing: .06em;
+      letter-spacing: .08em;
       text-transform: uppercase;
     }
     .kv-val {
       font-family: var(--mono);
-      font-size: 14px;
-      color: var(--accent);
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--blue);
       margin-top: 2px;
     }
 
     /* Spinner */
+    .spin-wrap { padding: 40px 0; text-align: center; }
     .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
       border-radius: 50%;
       animation: spin .7s linear infinite;
-      margin: 0 auto;
+      margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-label { font-size: 12px; color: var(--text-muted); }
 
     /* Error */
-    .error-box {
-      background: var(--red-glow);
-      border: 1px solid var(--red);
-      border-radius: var(--radius);
+    .err-box {
+      background: var(--red-bg);
+      border: 1.5px solid var(--red-border);
+      border-radius: var(--radius-sm);
       padding: 14px 16px;
       font-size: 13px;
-      color: #fca5a5;
+      color: var(--red);
+      line-height: 1.5;
     }
 
-    /* Config bar */
-    .config-bar {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .config-bar label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-    .config-bar input[type="text"] {
-      flex: 1;
-      min-width: 180px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--mono);
+    /* Footer */
+    .footer {
+      max-width: 1020px;
+      margin: 24px auto 0;
+      padding: 0 16px;
+      text-align: center;
       font-size: 11px;
-      padding: 6px 10px;
-      border-radius: var(--radius);
+      color: var(--text-muted);
+      line-height: 1.6;
     }
-    .config-bar input:focus { outline: none; border-color: var(--accent); }
+
+    /* ════ RESPONSIVE ════ */
+    @media (max-width: 768px) {
+      .page {
+        grid-template-columns: 1fr;
+        padding: 16px 12px 0;
+        gap: 16px;
+      }
+      .result-sticky { position: static; }
+      .g3 { grid-template-columns: 1fr 1fr; }
+      header { height: 56px; }
+      .header-pill { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .g2, .g3 { grid-template-columns: 1fr; }
+      .flags { grid-template-columns: 1fr 1fr; }
+      .kv { grid-template-columns: 1fr 1fr; }
+      .card-body { padding: 14px; }
+      header { padding: 0 14px; }
+      .header-text h1 { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
 
+<!-- ════ HEADER ════ -->
 <header>
-  <div>
-    <div class="header-badge">Prototipo académico</div>
+  <div class="header-cross">🏥</div>
+  <div class="header-text">
+    <h1>HTA Predictor &mdash; Destino Clínico</h1>
+    <p>Modelo Random Forest · EsSalud · Proyecto de tesis</p>
   </div>
-  <div>
-    <h1>HTA Predictor — Destino Clínico</h1>
-    <p>Clasificación de riesgo para pacientes hipertensos · Modelo XGBoost · ESSALUD</p>
-  </div>
+  <div class="header-pill">Prototipo académico</div>
 </header>
 
-<div class="container">
+<!-- ════ PÁGINA ════ -->
+<div class="page">
 
-  <!-- ── Formulario ── -->
+  <!-- ── Columna izquierda: formulario ── -->
   <div>
 
-    <!-- Config API -->
-    <div class="config-bar">
-      <label>URL del backend</label>
-      <input type="text" id="apiUrl"
-             value="https://hta-predictor-api.onrender.com"
-             placeholder="https://hta-predictor-api.onrender.com" />
+    <!-- 01 Encuentro -->
+    <div class="card">
+      <div class="card-head">
+        <span class="step">1</span>
+        <h2>📋 Datos del encuentro</h2>
+      </div>
+      <div class="card-body">
+        <div class="g2">
+          <div class="field">
+            <label>Fecha de atención</label>
+            <input type="date" name="fecha_atencion" id="fecha_atencion" />
+          </div>
+          <div class="field">
+            <label>Personal de salud</label>
+            <select name="tipo_personal_salud">
+              <option value="MEDICO">👨‍⚕️ Médico</option>
+              <option value="ENFERMERO(A)">👩‍⚕️ Enfermero(a)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Nivel de EESS</label>
+            <select name="nivel_eess">
+              <option value="2">🏥 Nivel II</option>
+              <option value="3">🏥 Nivel III</option>
+              <option value="4">🏥 Nivel IV</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sexo</label>
+            <select name="sexo">
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form id="htaForm">
-
-      <!-- Datos generales -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header">
-          <span class="eyebrow">01</span>
-          <h2>Datos del encuentro</h2>
+    <!-- 02 Clínico -->
+    <div class="card">
+      <div class="card-head">
+        <span class="step">2</span>
+        <h2>❤️ Datos clínicos</h2>
+      </div>
+      <div class="card-body">
+        <div class="g3">
+          <div class="field">
+            <label>Edad (años)</label>
+            <input type="number" name="edad" min="0" max="120" placeholder="55" required />
+          </div>
+          <div class="field">
+            <label>PA Sistólica (mmHg)</label>
+            <input type="number" name="pas" min="60" max="300" placeholder="160" required />
+          </div>
+          <div class="field">
+            <label>PA Diastólica (mmHg)</label>
+            <input type="number" name="pad" min="30" max="200" placeholder="95" required />
+          </div>
         </div>
-        <div class="card-body">
-          <div class="grid-2">
-            <div class="field">
-              <label>Fecha de atención</label>
-              <input type="date" name="fecha_atencion" id="fecha_atencion" />
-            </div>
-            <div class="field">
-              <label>Tipo de personal</label>
-              <select name="tipo_personal_salud">
-                <option value="MEDICO">Médico</option>
-                <option value="ENFERMERO(A)">Enfermero(a)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Nivel de establecimiento</label>
-              <select name="nivel_eess">
-                <option value="2">Nivel II</option>
-                <option value="3">Nivel III</option>
-                <option value="4">Nivel IV</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Sexo</label>
-              <select name="sexo">
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-              </select>
-            </div>
+
+        <div class="g2" style="margin-top:14px">
+          <div class="field">
+            <label>Estadio HTA</label>
+            <select name="estadio_hta">
+              <option value="Normal">🟢 Normal</option>
+              <option value="Elevada">🟡 Elevada</option>
+              <option value="HTA_1" selected>🟠 HTA Estadio 1</option>
+              <option value="HTA_2">🔴 HTA Estadio 2</option>
+              <option value="Crisis_HTA">🚨 Crisis Hipertensiva</option>
+              <option value="Desconocido">❓ Desconocido</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>N° diagnósticos totales</label>
+            <input type="number" name="n_diagnosticos" min="0" placeholder="3" required />
+          </div>
+          <div class="field">
+            <label>Diagnósticos definitivos</label>
+            <input type="number" name="n_diag_definitivos" min="0" placeholder="2" value="0" />
+          </div>
+          <div class="field">
+            <label>N° comorbilidades</label>
+            <input type="number" name="n_comorbilidades" min="0" placeholder="1" value="0" />
+          </div>
+        </div>
+
+        <div class="subsection">🛏️ Hospitalización</div>
+        <div class="g2">
+          <div class="field">
+            <label>¿Hospitalizado?</label>
+            <select name="flag_hospitalizado">
+              <option value="0">No</option>
+              <option value="1">Sí</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Días hospitalizado</label>
+            <input type="number" name="dias_hosp" min="0" placeholder="0" value="0" />
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Datos clínicos -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header">
-          <span class="eyebrow">02</span>
-          <h2>Datos clínicos</h2>
-        </div>
-        <div class="card-body">
-          <div class="grid-3">
-            <div class="field">
-              <label>Edad (años)</label>
-              <input type="number" name="edad" min="0" max="120" placeholder="55" required />
-            </div>
-            <div class="field">
-              <label>PA Sistólica (mmHg)</label>
-              <input type="number" name="pas" min="60" max="300" placeholder="160" required />
-            </div>
-            <div class="field">
-              <label>PA Diastólica (mmHg)</label>
-              <input type="number" name="pad" min="30" max="200" placeholder="95" required />
-            </div>
-          </div>
-
-          <div style="margin-top:14px;" class="grid-2">
-            <div class="field">
-              <label>Estadio HTA</label>
-              <select name="estadio_hta">
-                <option value="Normal">Normal</option>
-                <option value="Elevada">Elevada</option>
-                <option value="HTA_1" selected>HTA 1</option>
-                <option value="HTA_2">HTA 2</option>
-                <option value="Crisis_HTA">Crisis Hipertensiva</option>
-                <option value="Desconocido">Desconocido</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>N° diagnósticos totales</label>
-              <input type="number" name="n_diagnosticos" min="0" placeholder="3" required />
-            </div>
-            <div class="field">
-              <label>Diagnósticos definitivos</label>
-              <input type="number" name="n_diag_definitivos" min="0" placeholder="2" value="0" />
-            </div>
-            <div class="field">
-              <label>N° comorbilidades</label>
-              <input type="number" name="n_comorbilidades" min="0" placeholder="1" value="0" />
-            </div>
-          </div>
-
-          <!-- Hospitalización -->
-          <div class="section-divider">Hospitalización</div>
-          <div class="grid-2">
-            <div class="field">
-              <label>¿Hospitalizado?</label>
-              <select name="flag_hospitalizado" id="flagHosp">
-                <option value="0">No</option>
-                <option value="1">Sí</option>
-              </select>
-            </div>
-            <div class="field" id="diasHospField">
-              <label>Días hospitalizado</label>
-              <input type="number" name="dias_hosp" min="0" placeholder="0" value="0" />
-            </div>
-          </div>
+    <!-- 03 Comorbilidades -->
+    <div class="card">
+      <div class="card-head">
+        <span class="step">3</span>
+        <h2>💊 Comorbilidades</h2>
+      </div>
+      <div class="card-body">
+        <div class="flags">
+          <label class="flag"><input type="checkbox" name="flag_dm2" value="1"><span class="flag-check"></span><span class="flag-text">🩸 DM2</span></label>
+          <label class="flag"><input type="checkbox" name="flag_icc" value="1"><span class="flag-check"></span><span class="flag-text">❤️‍🩹 Insuf. Cardíaca</span></label>
+          <label class="flag"><input type="checkbox" name="flag_erc" value="1"><span class="flag-check"></span><span class="flag-text">🫘 Enf. Renal Crónica</span></label>
+          <label class="flag"><input type="checkbox" name="flag_epoc" value="1"><span class="flag-check"></span><span class="flag-text">🫁 EPOC</span></label>
+          <label class="flag"><input type="checkbox" name="flag_obesidad" value="1"><span class="flag-check"></span><span class="flag-text">⚖️ Obesidad</span></label>
+          <label class="flag"><input type="checkbox" name="flag_acv" value="1"><span class="flag-check"></span><span class="flag-text">🧠 ACV previo</span></label>
+          <label class="flag"><input type="checkbox" name="flag_infarto" value="1"><span class="flag-check"></span><span class="flag-text">💔 Infarto previo</span></label>
+          <label class="flag"><input type="checkbox" name="flag_dislipemia" value="1"><span class="flag-check"></span><span class="flag-text">🧪 Dislipemia</span></label>
+          <label class="flag"><input type="checkbox" name="flag_ansiedad" value="1"><span class="flag-check"></span><span class="flag-text">😟 Ansiedad</span></label>
+          <label class="flag"><input type="checkbox" name="flag_depresion" value="1"><span class="flag-check"></span><span class="flag-text">😔 Depresión</span></label>
         </div>
       </div>
+    </div>
 
-      <!-- Comorbilidades -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header">
-          <span class="eyebrow">03</span>
-          <h2>Comorbilidades</h2>
-        </div>
-        <div class="card-body">
-          <div class="flags-grid">
-            <label class="flag-item">
-              <input type="checkbox" name="flag_dm2"       value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">DM2</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_icc"       value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Insuf. Cardíaca</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_erc"       value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Enf. Renal Crónica</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_epoc"      value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">EPOC</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_obesidad"  value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Obesidad</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_acv"       value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">ACV previo</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_infarto"   value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Infarto previo</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_dislipemia" value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Dislipemia</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_ansiedad"  value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Ansiedad</span>
-            </label>
-            <label class="flag-item">
-              <input type="checkbox" name="flag_depresion" value="1" /><span class="flag-dot"></span>
-              <span class="flag-label">Depresión</span>
-            </label>
-          </div>
-        </div>
-      </div>
+    <button type="button" class="btn-predict" id="btnPredict">
+      🔍 Predecir destino clínico
+    </button>
 
-      <button type="submit" class="btn-submit" id="submitBtn">
-        Predecir destino clínico
-      </button>
-
-    </form>
   </div>
 
-  <!-- ── Panel resultado ── -->
-  <div class="result-panel">
-    <div class="card">
-      <div class="card-header">
-        <span class="eyebrow">Resultado</span>
-        <h2>Destino clínico predicho</h2>
+  <!-- ── Columna derecha: resultado ── -->
+  <div class="result-sticky">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head">
+        <span class="step" style="background:var(--text-muted)">→</span>
+        <h2>🎯 Resultado</h2>
       </div>
       <div class="card-body" id="resultBody">
         <div class="result-empty">
-          <div class="icon">⬡</div>
-          Completa el formulario y presiona <strong>Predecir</strong>
+          <div class="big">🩺</div>
+          <p>Completa los datos del paciente y presiona <strong>Predecir</strong> para obtener el destino clínico estimado.</p>
         </div>
       </div>
     </div>
   </div>
 
-</div><!-- /container -->
+</div>
+
+<p class="footer">
+  ⚕️ HTA Predictor · Proyecto de tesis · No reemplaza el criterio clínico profesional<br>
+  Datos de pacientes EsSalud · Modelo Random Forest · F1-macro validado en conjunto de prueba
+</p>
 
 <script>
-// ── Fecha default = hoy ──────────────────────────────────────────
+// ════════════════════════════════════════════════
+// CONFIGURACIÓN — solo editar aquí
+// ════════════════════════════════════════════════
+const API_URL = "https://TU-APP.onrender.com";
+
+// ════════════════════════════════════════════════
+// METADATA POR CLASE
+// ════════════════════════════════════════════════
+const CLASE_META = {
+  Caso_Critico: { emoji: '🚨', label: 'Caso Crítico',  color: 'red',   bar: '#C0392B' },
+  Citado:       { emoji: '📅', label: 'Citado',        color: 'amber', bar: '#B95C00' },
+  Alta:         { emoji: '✅', label: 'Alta',           color: 'green', bar: '#1A7A40' },
+};
+function meta(c) { return CLASE_META[c] || { emoji: '•', label: c, color: 'green', bar: '#7A9AB8' }; }
+
+// ════ Fecha por defecto ════
 document.getElementById('fecha_atencion').value = new Date().toISOString().split('T')[0];
 
-// ── Mostrar/ocultar días de hospitalización ──────────────────────
-document.getElementById('flagHosp').addEventListener('change', function() {
-  const field = document.querySelector('[name="dias_hosp"]');
-  field.value = this.value === '0' ? '0' : field.value;
-});
+// ════ Render resultado ════
+function renderResult(d) {
+  const m  = meta(d.destino_predicho);
+  const fc = d.features_calculadas;
 
-// ── Colores para barras de probabilidad ─────────────────────────
-const COLOR_MAP = {
-  'Caso_Critico':     '#ef4444',
-  'Hospitalizacion':  '#f59e0b',
-  'Emergencia':       '#f97316',
-  'Consulta_Externa': '#22c55e',
-  'Alta':             '#38bdf8',
-};
-function getColor(clase) {
-  return COLOR_MAP[clase] || '#94a3b8';
-}
-
-// ── Render resultado ─────────────────────────────────────────────
-function renderResult(data) {
-  const colorClass = data.color;    // red | orange | green
-  const fc = data.features_calculadas;
-
-  // Ordenar probabilidades de mayor a menor
-  const probs = Object.entries(data.probabilidades)
-    .sort((a, b) => b[1] - a[1]);
-
-  const probBars = probs.map(([clase, pct]) => `
-    <div class="prob-item">
-      <label>${clase.replace(/_/g,' ')}<span>${pct.toFixed(1)}%</span></label>
-      <div class="prob-bar-bg">
-        <div class="prob-bar-fill"
-             style="width:${pct}%; background:${getColor(clase)}"></div>
-      </div>
-    </div>`).join('');
+  const probs = Object.entries(d.probabilidades).sort((a,b) => b[1]-a[1]);
+  const bars  = probs.map(([c, p]) => {
+    const cm = meta(c);
+    return `<div class="prob-row">
+      <div class="prob-label">${cm.emoji} ${cm.label}<span>${p.toFixed(1)}%</span></div>
+      <div class="prob-track"><div class="prob-fill" style="width:${p}%;background:${cm.bar}"></div></div>
+    </div>`;
+  }).join('');
 
   document.getElementById('resultBody').innerHTML = `
-    <div class="destino-badge ${colorClass}">
-      <div class="destino-label">Destino predicho</div>
-      <div class="destino-valor">${data.destino_predicho.replace(/_/g,' ')}</div>
-      <div class="confianza">Confianza: ${data.confianza_pct}%</div>
+    <div class="destino-card ${m.color}">
+      <div class="destino-emoji">${m.emoji}</div>
+      <div class="destino-eyebrow">Destino predicho</div>
+      <div class="destino-label">${m.label}</div>
+      <div class="destino-conf">Confianza: ${d.confianza_pct}%</div>
     </div>
 
-    <div class="section-divider" style="margin-bottom:12px">Distribución de probabilidad</div>
-    <div class="prob-list" style="margin-bottom:20px">${probBars}</div>
+    <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">📊 Distribución de probabilidad</p>
+    <div class="prob-list">${bars}</div>
 
-    <div class="section-divider" style="margin-bottom:12px">Features calculadas</div>
-    <div class="kv-grid">
-      <div class="kv-item">
-        <div class="kv-key">PP</div>
-        <div class="kv-val">${fc.PP} mmHg</div>
-      </div>
-      <div class="kv-item">
-        <div class="kv-key">PAM</div>
-        <div class="kv-val">${fc.PAM} mmHg</div>
-      </div>
-      <div class="kv-item">
-        <div class="kv-key">PA Controlada</div>
-        <div class="kv-val">${fc.PA_controlada ? 'Sí' : 'No'}</div>
-      </div>
-      <div class="kv-item">
-        <div class="kv-key">Grupo edad</div>
-        <div class="kv-val">${fc.GRUPO_EDAD.replace(/_/g,' ')}</div>
-      </div>
-      <div class="kv-item" style="grid-column:span 2">
-        <div class="kv-key">Índice complejidad</div>
-        <div class="kv-val">${fc.IDX_complejidad}</div>
-      </div>
-    </div>
-  `;
+    <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">🧮 Features derivadas</p>
+    <div class="kv">
+      <div class="kv-box"><div class="kv-key">Presión de pulso</div><div class="kv-val">${fc.PP} mmHg</div></div>
+      <div class="kv-box"><div class="kv-key">PAM</div><div class="kv-val">${fc.PAM} mmHg</div></div>
+      <div class="kv-box"><div class="kv-key">PA Controlada</div><div class="kv-val">${fc.PA_controlada ? '✅ Sí' : '❌ No'}</div></div>
+      <div class="kv-box"><div class="kv-key">Grupo etario</div><div class="kv-val" style="font-size:12px">${fc.GRUPO_EDAD.replace(/_/g,' ')}</div></div>
+      <div class="kv-box" style="grid-column:span 2"><div class="kv-key">Índice de complejidad</div><div class="kv-val">${fc.IDX_complejidad}</div></div>
+    </div>`;
 }
 
-// ── Submit ───────────────────────────────────────────────────────
-document.getElementById('htaForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const btn = document.getElementById('submitBtn');
-  const resultBody = document.getElementById('resultBody');
-  const apiUrl = document.getElementById('apiUrl').value.trim().replace(/\/$/, '');
-
-  btn.disabled = true;
-  btn.textContent = 'Calculando...';
-  resultBody.innerHTML = '<div style="text-align:center;padding:40px"><div class="spinner"></div></div>';
-
-  // Recopilar valores del formulario
-  const fd = new FormData(this);
-  const payload = {};
-
-  // Flags: si no está marcado = 0
-  ['flag_dm2','flag_icc','flag_erc','flag_epoc','flag_obesidad',
-   'flag_acv','flag_infarto','flag_dislipemia','flag_ansiedad','flag_depresion']
-    .forEach(f => payload[f] = 0);
-
-  for (const [k, v] of fd.entries()) {
-    const num = ['edad','pas','pad','nivel_eess','flag_hospitalizado',
-                 'dias_hosp','n_diagnosticos','n_diag_definitivos',
-                 'n_comorbilidades','fecate_post_fecfed',
-                 'flag_dm2','flag_icc','flag_erc','flag_epoc','flag_obesidad',
+// ════ Recopilar form ════
+function getPayload() {
+  const flags = ['flag_dm2','flag_icc','flag_erc','flag_epoc','flag_obesidad',
                  'flag_acv','flag_infarto','flag_dislipemia','flag_ansiedad','flag_depresion'];
-    payload[k] = num.includes(k) ? parseFloat(v) : v;
-  }
+  const numFields = ['edad','pas','pad','nivel_eess','flag_hospitalizado','dias_hosp',
+                     'n_diagnosticos','n_diag_definitivos','n_comorbilidades','fecate_post_fecfed',
+                     ...flags];
 
-  // Checkboxes marcados sobreescriben el 0 inicial
-  this.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+  const payload = { fecate_post_fecfed: 1 };
+  flags.forEach(f => payload[f] = 0);
+
+  // Campos de texto/select/date
+  ['fecha_atencion','tipo_personal_salud','sexo','estadio_hta'].forEach(n => {
+    const el = document.querySelector(`[name="${n}"]`);
+    if (el) payload[n] = el.value;
+  });
+
+  numFields.forEach(n => {
+    const el = document.querySelector(`[name="${n}"]`);
+    if (el) payload[n] = parseFloat(el.value) || 0;
+  });
+
+  // Checkboxes marcados
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
     payload[cb.name] = 1;
   });
 
+  return payload;
+}
+
+// ════ Submit ════
+document.getElementById('btnPredict').addEventListener('click', async () => {
+  const btn = document.getElementById('btnPredict');
+  const resultBody = document.getElementById('resultBody');
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Analizando...';
+  resultBody.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><div class="spin-label">Procesando datos clínicos…</div></div>`;
+
   try {
-    const res = await fetch(`${apiUrl}/predecir`, {
+    const res = await fetch(`${API_URL}/predecir`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(getPayload()),
     });
 
     if (!res.ok) {
@@ -696,19 +723,13 @@ document.getElementById('htaForm').addEventListener('submit', async function(e) 
       throw new Error(err.detail || `Error ${res.status}`);
     }
 
-    const data = await res.json();
-    renderResult(data);
+    renderResult(await res.json());
 
   } catch (err) {
-    resultBody.innerHTML = `
-      <div class="error-box">
-        <strong>Error al conectar con el backend</strong><br>
-        ${err.message}<br><br>
-        Verifica que la URL del backend sea correcta y que el servidor esté activo.
-      </div>`;
+    resultBody.innerHTML = `<div class="err-box">⚠️ <strong>Error al conectar con el servidor</strong><br><br>${err.message}<br><br>Verifica que el backend esté activo en Render.</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Predecir destino clínico';
+    btn.innerHTML = '🔍 Predecir destino clínico';
   }
 });
 </script>
